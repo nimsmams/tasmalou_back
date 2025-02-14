@@ -75,6 +75,8 @@ const login = (request, response) => {
       console.log(user);
       const passwordIsValid = await bcrypt.compare(password, result[0].password);
 
+      console.log(passwordIsValid);
+
       if (!passwordIsValid) {
         response
           .status(401)

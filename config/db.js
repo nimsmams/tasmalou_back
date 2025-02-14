@@ -8,4 +8,5 @@ const connexion = db.createConnection({
     password  : process.env.DB_PASSWORD
 });
 
+
 module.exports = connexion;

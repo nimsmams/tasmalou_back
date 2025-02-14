@@ -1,6 +1,10 @@
--- SQLBook: Code
 -- Active: 1729777536480@@127.0.0.1@3308@tamalou
+-- SQLBook: Code
 DROP DATABASE tamalou;
+USE tamalou;
+SHOW DATABASE;
+
+SELECT * FROM user;
 
 CREATE DATABASE tamalou; 
 
@@ -23,15 +27,15 @@ DROP TABLE chemical_structure,
 
 SET FOREIGN_KEY_CHECKS = 1;
 
-DROP TABLE product,
+DROP TABLE product;
 
-DROP TABLE productline,
+DROP TABLE productline;
 
-DROP TABLE property,
+DROP TABLE property;
 
-DROP TABLE 'user',
+DROP TABLE 'user';
 
-DROP TABLE category,
+DROP TABLE category;
 
 CREATE TABLE IF NOT EXISTS `user`(
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -43,6 +47,29 @@ CREATE TABLE IF NOT EXISTS `user`(
     gender VARCHAR(100) NOT NULL,
     role VARCHAR(100) NOT NULL
 );
+
+INSERT INTO `user` (email, password, lastname, firstname, age, gender, role)
+VALUES (
+    'test05@gmail.com', 
+    'Test05', 
+    'nims', 
+    'mams', 
+    '19851985-01-01',
+    'male',
+    'ADMIN');
+
+    INSERT INTO `user` (email, password, lastname, firstname, age, gender, role)
+VALUES (
+    'test08@gmail.com', 
+    'Test08', 
+    'nana', 
+    'mama', 
+    '1987-08-08',
+    'male',
+    'ADMIN')
+
+
+
 
 CREATE TABLE IF NOT EXISTS category (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -68,6 +95,7 @@ CREATE TABLE IF NOT EXISTS product (
     plant_section VARCHAR (100) NOT NULL,
     family VARCHAR (100) NOT NULL, 
     `application_id` INT,
+    image_path VARCHAR (200) NOT NULL,
     FOREIGN KEY (`application_id`) REFERENCES `application` (id)
 );
 
