@@ -61,21 +61,30 @@ const login = (request, response) => {
 
   userModel.login(email, async (err, result) => {
     if (err) {
-      response.status(500).send({ messag: "email introuvable" });
+      console.error("Erreur SQL :", err);
+      response.status(500).send({ messag: "Erreur serveur lors de la connexion." });
       return;
     }
 
-    if (result.length != 0) {
-      // let user = result[0];
+    if (result.length === 0) {
+      response.status(401).send({ message: "Identifiant ou mot de passe incorrect" });
+      return;
+    }
+
       const user = {
         email: result[0].email,
         id: result[0].id,
         role:result[0].role,
-      }
-      console.log(user);
+      };
+
+      console.log("Utilisateur trouvé :", user);
+      console.log("Mot de passe entré :", password);
+    console.log("Mot de passe en base :", result[0].password);
+
+      try {
       const passwordIsValid = await bcrypt.compare(password, result[0].password);
 
-      console.log(passwordIsValid);
+      console.log("Mot de passe valide ?",passwordIsValid);
 
       if (!passwordIsValid) {
         response
@@ -92,7 +101,8 @@ const login = (request, response) => {
       );
 
       response.status(200).send({ user, token });
-    } else {
+    } catch (error) {
+      console.error("Erreur lors de la comparaison du mot de passe :", error);
       response
         .status(401)
         .send({ message: "identifiant ou mot de passe incorrect" });
