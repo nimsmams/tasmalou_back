@@ -5,7 +5,7 @@ const { request, response } = require("express");
 
 // ajouter une catégorie
 const addCategory = (request, response) => {
-  console.log("start");
+  console.log("debut de l'ajout de categorie");
 
   const { category_name, description, parent_id } =
     request.body;
@@ -19,14 +19,14 @@ const addCategory = (request, response) => {
           "le token n'est pas present veuillez vous connecter pour avoir votre token",
       });
   }
-  let transform = tokenIsInclude.split(" ");
+  let transform = tokenIsInclude.split(" ")[1];
   let token = transform[1];
 
   jwt.verify(token, process.env.SECRET_KEY, (err, result) => {
 
     if (err) {
       // si le token est pas valide ou qu'il soit expire
-      console.log("token exp");
+      console.log("token expiré ou invalide");
 
       response.send("le token n'est pas valide ou il est expire");
       return;
@@ -42,13 +42,15 @@ const addCategory = (request, response) => {
     //console.log('before product');
     if (
       !category_name ||
-      !description ||
-      !parent_id
+      !description
     ) {
       return response
         .status(400)
         .json({ message: "Tous les champs sont requis." });
     }
+
+    // Permet à `parent_id` d'être NULL si c'est une catégorie racine
+    const parentCategory = parent_id ? parent_id : null;
 
     categoryModel.saveCategory(
       [category_name, description, parent_id],

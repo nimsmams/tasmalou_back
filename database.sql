@@ -15,15 +15,15 @@ USE tamalou;
 --DROP DATABASE tamalou;
 SET FOREIGN_KEY_CHECKS = 0;
 
-DROP TABLE IF EXISTS category_product,
+DROP TABLE IF EXISTS category_product;
 
-DROP TABLE IF EXISTS productline_product,
+DROP TABLE IF EXISTS productline_product;
 
-DROP TABLE IF EXISTS chemical_structure_product,
+DROP TABLE IF EXISTS chemical_structure_product;
 
-DROP TABLE IF EXISTS property_product,
+DROP TABLE IF EXISTS property_product;
 
-DROP TABLE chemical_structure,
+DROP TABLE chemical_structure;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
