@@ -1,73 +1,31 @@
 const jwt = require("jsonwebtoken");
-const categoryModel= require("../model/categoryModel");
+const categoryModel = require("../model/categoryModel");
 const { request, response } = require("express");
 
-
 // ajouter une catégorie
-const addCategory = (request, response) => {
+const addCategory = async (request, response) => {
   console.log("debut de l'ajout de categorie");
 
-  const { category_name, description, parent_id } =
-    request.body;
-  // verifier si le token est inclu dans l'entete de la reque
-  const tokenIsInclude = request.headers.authorization;
-  if (!tokenIsInclude) {
+  const { category_name, description, parent_id = null } = request.body;
+  if (!category_name || !description) {
     return response
-      .status(401)
-      .json({
-        message:
-          "le token n'est pas present veuillez vous connecter pour avoir votre token",
-      });
+      .status(400)
+      .json({ message: "Tous les champs sont requis." });
   }
-  let transform = tokenIsInclude.split(" ")[1];
-  let token = transform[1];
 
-  jwt.verify(token, process.env.SECRET_KEY, (err, result) => {
-
-    if (err) {
-      // si le token est pas valide ou qu'il soit expire
-      console.log("token expiré ou invalide");
-
-      response.send("le token n'est pas valide ou il est expire");
-      return;
-    }
-    console.log("ok");
-
-    // si le token est valide on extrait l'id, l'email
-    console.log(result);
-    // let author = result.user_id;
-    //let productedAt= new Date();
-    //let responTo= null;//mais ici mettre un if car si deja ID sur le product alors assigner ID à respondTo
-
-    //console.log('before product');
-    if (
-      !category_name ||
-      !description
-    ) {
-      return response
-        .status(400)
-        .json({ message: "Tous les champs sont requis." });
-    }
-
-    // Permet à `parent_id` d'être NULL si c'est une catégorie racine
-    const parentCategory = parent_id ? parent_id : null;
-
-    categoryModel.saveCategory(
-      [category_name, description, parent_id],
-      (e, r) => {
-        console.log("categorized");
-
-        if (e) {
-          console.log(e);
-
-          response.send("erreur lors de l'insertion");
-          return;
-        }
-        response.send({ message: "Commentaire ajoute" });
-      }
+  try {
+    const result = await categoryModel.saveCategory(
+      category_name,
+      description,
+      parent_id
     );
-  });
+    response.send({ message: "Commentaire ajoute" });
+  } catch (err) {
+    console.error(err);
+    response.send("Erreur when trying to add category");
+  }
 };
+
 // recuperer une catégorie via son identifiant
 const getCategory = (request, response) => {
   let id = request.params.id;
@@ -83,26 +41,35 @@ const getCategory = (request, response) => {
     response.json(res[0]);
   });
 };
+
 // recuperer toutes les catégories
-const getAllCategories = (request, response) => {
-  categoryModel.getAllCategories((err, res) => {
-    if (err) {
-      response.send({ message: "erreur interne category" });
-      return;
-    }
+const getAllCategories = async (request, response) => {
+  try {
+    const res = await categoryModel.getAllCategories();
     response.json(res);
-  });
+  } catch (err) {
+    console.error(err);
+    response.send("Erreur when trying to retrieve category");
+  }
 };
 
 // Associer un produit à une catégorie
 const assignProductToCategory = (req, res) => {
   const { product_id, category_id } = req.body;
-  categoryModel.assignProductToCategory(product_id, category_id)
+  categoryModel
+    .assignProductToCategory(product_id, category_id)
     .then((result) => {
-      res.json({ message: 'Produit associé à la catégorie', product_id, category_id });
+      res.json({
+        message: "Produit associé à la catégorie",
+        product_id,
+        category_id,
+      });
     })
     .catch((err) => {
-      res.status(500).json({ message: 'Erreur lors de l\'association produit-catégorie', error: err });
+      res.status(500).json({
+        message: "Erreur lors de l'association produit-catégorie",
+        error: err,
+      });
     });
 };
 
@@ -169,9 +136,6 @@ module.exports = {
   getUserCategory,
   assignProductToCategory,
 };
-
-
-
 
 /*
 //ajouter une category
